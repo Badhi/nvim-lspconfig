@@ -50,12 +50,26 @@ local root_files = {
 -- server changes. This can be used to display progress as the server is
 -- starting up.
 local function on_language_status(_, _, result)
-	local command = vim.api.nvim_command
-    command('echohl ModeMsg')
-    command(string.format('echo "%s"', result.message))
-    command('echohl None')
+  local command = vim.api.nvim_command
+  command('echohl ModeMsg')
+  command(string.format('echo "%s"', result.message))
+  command('echohl None')
 end
 
+-- If the text document version is 0, set it to nil instead so that Neovim
+-- won't refuse to update a buffer that it believes is newer than edits.
+-- See: https://github.com/eclipse/eclipse.jdt.ls/issues/1695
+local function fix_zero_version(workspace_edit)
+  if workspace_edit and workspace_edit.documentChanges then
+    for _, change in pairs(workspace_edit.documentChanges) do
+      local text_document = change.textDocument
+      if text_document and text_document.version and text_document.version == 0 then
+        text_document.version = nil
+      end
+    end
+  end
+  return workspace_edit
+end
 
 configs[server_name] = {
   default_config = {
@@ -91,16 +105,24 @@ configs[server_name] = {
           -- if command is string, then 'ation' is Command in java format,
           -- then we add 'edit' property to change to CodeAction in LSP and 'edit' will be executed first
           if action.command == 'java.apply.workspaceEdit' then
-            action.edit = action.edit or action.arguments[1]
+            action.edit = fix_zero_version(action.edit or action.arguments[1])
           -- if command is table, then 'action' is CodeAction in java format
           -- then we add 'edit' property to change to CodeAction in LSP and 'edit' will be executed first
           elseif type(action.command) == 'table' and action.command.command == 'java.apply.workspaceEdit' then
-            action.edit = action.edit or action.command.arguments[1]
+            action.edit = fix_zero_version(action.edit or action.command.arguments[1])
           end
         end
-
         handlers['textDocument/codeAction'](a, b, actions)
       end;
+
+      ['textDocument/rename'] = function(a, b, workspace_edit)
+        handlers['textDocument/rename'](a, b, fix_zero_version(workspace_edit))
+      end;
+
+      ['workspace/applyEdit'] = function(a, b, workspace_edit)
+        handlers['workspace/applyEdit'](a, b, fix_zero_version(workspace_edit))
+      end;
+
       ['language/status'] = vim.schedule_wrap(on_language_status)
     };
   };
@@ -119,7 +141,7 @@ inferred. Please set the following environmental variables to match your install
 ```bash
 export JAR=/path/to/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/plugins/org.eclipse.equinox.launcher_1.6.0.v20200915-1508.jar
 export GRADLE_HOME=$HOME/gradle
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.9.11-9.fc33.x86_64/
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")
 export JDTLS_CONFIG=/path/to/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/config_linux
 export WORKSPACE=$HOME/workspace
 ```

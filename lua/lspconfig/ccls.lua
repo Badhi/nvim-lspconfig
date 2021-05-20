@@ -5,7 +5,9 @@ configs.ccls = {
   default_config = {
     cmd = {"ccls"};
     filetypes = {"c", "cpp", "objc", "objcpp"};
-    root_dir = util.root_pattern("compile_commands.json", "compile_flags.txt", ".git");
+    root_dir = function(fname)
+      return util.root_pattern("compile_commands.json", "compile_flags.txt", ".git")(fname) or util.path.dirname(fname)
+    end;
   };
   docs = {
     description = [[
@@ -21,7 +23,7 @@ Customization options are passed to ccls at initialization time via init_options
 local lspconfig = require'lspconfig'
 lspconfig.ccls.setup {
   init_options = {
-	  compilationDatabaseDirectory = "build";
+    compilationDatabaseDirectory = "build";
     index = {
       threads = 0;
     };
@@ -35,7 +37,7 @@ lspconfig.ccls.setup {
 
 ]];
     default_config = {
-      root_dir = [[root_pattern("compile_commands.json", "compile_flags.txt", ".git")]];
+      root_dir = [[root_pattern("compile_commands.json", "compile_flags.txt", ".git") or dirname]];
     };
   };
 }

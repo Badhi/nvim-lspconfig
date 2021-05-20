@@ -36,6 +36,7 @@ configs[server_name] = {
         analysis = {
           autoSearchPaths = true;
           useLibraryCodeForTypes = true;
+          diagnosticMode = 'workspace';
         };
       };
     };
@@ -47,6 +48,7 @@ configs[server_name] = {
     };
   };
   docs = {
+    package_json = 'https://raw.githubusercontent.com/microsoft/pyright/master/packages/vscode-pyright/package.json',
     description = [[
 https://github.com/microsoft/pyright
 

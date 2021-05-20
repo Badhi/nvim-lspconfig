@@ -117,12 +117,13 @@ return function ()
        vim.list_extend(buf_lines, matching_config_info)
     end
   end
-  buf_lines = vim.lsp.util._trim_and_pad(buf_lines, { pad_left = 2, pad_top = 1})
+  buf_lines = vim.lsp.util._trim(buf_lines, {})
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, buf_lines )
   vim.api.nvim_buf_set_option(bufnr,'modifiable',false)
   vim.api.nvim_buf_set_option(bufnr,'filetype','lspinfo')
-  vim.fn.matchadd("Title", table.concat(vim.tbl_keys(configs), '\\|'))
-  vim.fn.matchadd("Title", buffer_filetype)
+  local configs_pattern = '\\%(' .. table.concat(vim.tbl_keys(configs), '\\|') .. '\\)'
+  vim.cmd('syntax match Title /\\%(Client\\|Config\\):.*\\zs' .. configs_pattern .. '/')
+  vim.cmd('syntax match Identifier /filetypes:.*\\zs\\<' .. buffer_filetype .. '\\>/')
   vim.fn.matchadd("Error",
     "No filetypes defined, please define filetypes in setup().\\|"..
     "cmd not defined\\|" ..
