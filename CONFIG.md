@@ -2386,6 +2386,24 @@ This server accepts configuration via the `settings` key.
   
   Additional Julia arguments\.
 
+- **`julia.completionmode`**: `enum { "exportedonly", "import", "qualify" }`
+
+  Default: `"import"`
+  
+  Sets the mode for completions\.
+
+- **`julia.debuggerDefaultCompiled`**: `array`
+
+  Default: `{ "Base.", "-Base.!", "-Base.all", "-Base.all!", "-Base.any", "-Base.any!", "-Base.cd", "-Base.iterate", "-Base.collect", "-Base.collect_similar", "-Base._collect", "-Base.collect_to!", "-Base.collect_to_with_first!", "-Base.filter", "-Base.filter!", "-Base.foreach", "-Base.findall", "-Base.findfirst", "-Base.findlast", "-Base.findnext", "-Base.findprev", "-Base.Generator", "-Base.map", "-Base.map!", "-Base.maximum!", "-Base.minimum!", "-Base.mktemp", "-Base.mktempdir", "-Base.open", "-Base.prod!", "-Base.redirect_stderr", "-Base.redirect_stdin", "-Base.redirect_stdout", "-Base.reenable_sigint", "-Base.setindex!", "-Base.setprecision", "-Base.setrounding", "-Base.show", "-Base.sprint", "-Base.sum", "-Base.sum!", "-Base.task_local_storage", "-Base.timedwait", "-Base.withenv", "Core", "Core.Compiler.", "Core.IR", "Core.Intrinsics", "DelimitedFiles", "Distributed", "LinearAlgebra.", "Serialization", "Statistics", "-Statistics.mean", "SparseArrays", "Mmap" }`
+  
+  Functions or modules that are set to compiled mode when setting the defaults\.
+
+- **`julia.deleteJuliaCovFiles`**: `boolean`
+
+  Default: `"true"`
+  
+  Delete Julia \.cov files when running tests with coverage\, leaving only a \.lcov file behind\.
+
 - **`julia.editor`**: `string|null`
 
   Default: `vim.NIL`
@@ -2426,7 +2444,7 @@ This server accepts configuration via the `settings` key.
   
   null
 
-- **`julia.execution.resultType`**: `enum { "REPL", "inline", "both" }`
+- **`julia.execution.resultType`**: `enum { "REPL", "inline", "inline, errors in REPL", "both" }`
 
   Default: `"REPL"`
   
@@ -2586,7 +2604,29 @@ This server accepts configuration via the `settings` key.
 
   Default: `""`
   
-  Julia package server\. Set\'s the \`JULIA\_PKG\_SERVER\` environment variable \*before\* starting a Julia process\. Leave this empty to use the systemwide default\. Requires a restart of the Julia process\.
+  null
+
+- **`julia.persistentSession.enabled`**: `boolean`
+
+  null
+
+- **`julia.persistentSession.shell`**: `string`
+
+  Default: `"/bin/sh"`
+  
+  Shell used to start the persistent session\.
+
+- **`julia.persistentSession.shellExecutionArgument`**: `string`
+
+  Default: `"-c"`
+  
+  null
+
+- **`julia.persistentSession.tmuxSessionName`**: `string`
+
+  Default: `"julia_vscode"`
+  
+  null
 
 - **`julia.trace.server`**: `enum { "off", "messages", "verbose" }`
 
@@ -4263,15 +4303,19 @@ See [docs](https://github.com/rust-analyzer/rust-analyzer/tree/master/docs/user#
 This server accepts configuration via the `settings` key.
 <details><summary>Available settings:</summary>
 
-- **`rust-analyzer.assist.importGroup`**: `boolean`
+- **`rust-analyzer.assist.importEnforceGranularity`**: `boolean`
 
-  Default: `true`
+  null
+
+- **`rust-analyzer.assist.importGranularity`**: `enum { "preserve", "crate", "module", "item" }`
+
+  Default: `"crate"`
   
   null
 
-- **`rust-analyzer.assist.importMergeBehavior`**: `enum { "none", "crate", "module" }`
+- **`rust-analyzer.assist.importGroup`**: `boolean`
 
-  Default: `"crate"`
+  Default: `true`
   
   null
 
@@ -6097,6 +6141,12 @@ This server accepts configuration via the `settings` key.
   Default: `true`
   
   Automatically pull available YAML schemas from JSON Schema Store
+
+- **`yaml.schemaStore.url`**: `string`
+
+  Default: `"https://www.schemastore.org/api/json/catalog.json"`
+  
+  URL of schema store catalog to use
 
 - **`yaml.schemas`**: `object`
 
